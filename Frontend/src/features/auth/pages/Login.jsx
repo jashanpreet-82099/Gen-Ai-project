@@ -1,16 +1,24 @@
 import { useState } from "react";
-import { Mail, Lock, Eye, EyeOff, ShieldCheck } from "lucide-react";
-import {Link} from "react-router"
+import { Mail, Lock, Eye, EyeOff, ShieldCheck, Loader } from "lucide-react";
+import { Link } from "react-router";
+import { useAuth } from "../Hooks/useAuth";
+import { useNavigate } from "react-router";
 
 export default function Login() {
   const [showPassword, setShowPassword] = useState(false);
-  const [submitting, setSubmitting] = useState(false);
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const navigate = useNavigate()
 
-  const handleSubmit = (e) => {
+  const { loading, handleLogin } = useAuth();
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    setSubmitting(true);
-    setTimeout(() => setSubmitting(false), 1400);
+    await handleLogin({ email, password });
+    navigate('/')
   };
+
+
 
   return (
     <main className="w-full h-screen flex items-center justify-center relative overflow-hidden bg-gray-950">
@@ -68,6 +76,9 @@ export default function Login() {
               className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-500 pointer-events-none"
             />
             <input
+              onChange={(e) => {
+                setEmail(e.target.value);
+              }}
               className="lf-input w-full rounded-xl border border-white/10 bg-white/[0.03] pl-10 pr-4 pt-5 pb-2.5 text-sm text-white outline-none transition-colors focus:border-pink-500 focus:bg-pink-500/10"
               type="email"
               id="email"
@@ -90,6 +101,9 @@ export default function Login() {
               className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-500 pointer-events-none"
             />
             <input
+              onChange={(e) => {
+                setPassword(e.target.value);
+              }}
               className="lf-input w-full rounded-xl border border-white/10 bg-white/[0.03] pl-10 pr-10 pt-5 pb-2.5 text-sm text-white outline-none transition-colors focus:border-pink-500 focus:bg-pink-500/10"
               type={showPassword ? "text" : "password"}
               id="password"
@@ -127,10 +141,16 @@ export default function Login() {
           {/* submit */}
           <button
             type="submit"
-            disabled={submitting}
+            disabled={loading}
             className="w-full py-3.5 rounded-xl font-semibold text-sm text-white bg-gradient-to-br from-pink-500 to-pink-700 shadow-lg shadow-pink-900/40 transition-all hover:-translate-y-0.5 hover:shadow-xl disabled:opacity-70 disabled:translate-y-0"
           >
-            {submitting ? "Logging in..." : "Log in"}
+            {loading ? (
+              <div className="flex items-center justify-center">
+                <Loader className="w-5 h-5 animate-spin text-white" />
+              </div>
+            ) : (
+              "Log in"
+            )}
           </button>
         </form>
 

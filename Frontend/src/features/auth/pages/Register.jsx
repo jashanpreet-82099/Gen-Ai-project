@@ -1,16 +1,23 @@
 import { useState } from "react";
-import { Mail, Lock, Eye, EyeOff, ShieldCheck, User } from "lucide-react";
-import {Link} from "react-router"
+import { Mail, Lock, Eye, EyeOff, UserShield, User ,Loader } from "lucide-react";
+import { Link, useNavigate } from "react-router";
+import { useAuth } from "../Hooks/useAuth";
 
 const Register = () => {
   const [showPassword, setShowPassword] = useState(false);
-    const [submitting, setSubmitting] = useState(false);
-  
-    const handleSubmit = (e) => {
-      e.preventDefault();
-      setSubmitting(true);
-      setTimeout(() => setSubmitting(false), 1400);
-    };
+  const [username, setUsername] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const { loading, handleRegister } = useAuth();
+  const navigate = useNavigate()
+
+
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    await handleRegister({username, email, password})
+    navigate('/')
+  };
 
   return (
     <main className="w-full h-screen flex items-center justify-center relative overflow-hidden bg-gray-950">
@@ -49,7 +56,7 @@ const Register = () => {
         <div className="relative w-13 h-13 mb-5">
           <div className="absolute inset-0 rounded-2xl bg-pink-500 opacity-40 animate-ping" />
           <div className="relative w-13 h-13 rounded-2xl bg-gradient-to-br from-pink-500 to-cyan-400 flex items-center justify-center">
-            <ShieldCheck size={24} className="text-white" strokeWidth={2.2} />
+            <UserShield size={24} className="text-white" strokeWidth={2.2} />
           </div>
         </div>
 
@@ -61,13 +68,15 @@ const Register = () => {
         </p>
 
         <form onSubmit={handleSubmit}>
-
           <div className="relative mb-4">
             <User
               size={17}
               className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-500 pointer-events-none"
             />
             <input
+            onChange={(e) => {
+                setUsername(e.target.value);
+              }}
               className="lf-input w-full rounded-xl border border-white/10 bg-white/[0.03] pl-10 pr-4 pt-5 pb-2.5 text-sm text-white outline-none transition-colors focus:border-pink-500 focus:bg-pink-500/10"
               type="text"
               id="text"
@@ -90,6 +99,9 @@ const Register = () => {
               className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-500 pointer-events-none"
             />
             <input
+            onChange={(e) => {
+                setEmail(e.target.value);
+              }}
               className="lf-input w-full rounded-xl border border-white/10 bg-white/[0.03] pl-10 pr-4 pt-5 pb-2.5 text-sm text-white outline-none transition-colors focus:border-pink-500 focus:bg-pink-500/10"
               type="email"
               id="email"
@@ -112,6 +124,9 @@ const Register = () => {
               className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-500 pointer-events-none"
             />
             <input
+            onChange={(e) => {
+                setPassword(e.target.value);
+              }}
               className="lf-input w-full rounded-xl border border-white/10 bg-white/[0.03] pl-10 pr-10 pt-5 pb-2.5 text-sm text-white outline-none transition-colors focus:border-pink-500 focus:bg-pink-500/10"
               type={showPassword ? "text" : "password"}
               id="password"
@@ -146,22 +161,28 @@ const Register = () => {
           {/* submit */}
           <button
             type="submit"
-            disabled={submitting}
+            disabled={loading}
             className="w-full py-3.5 rounded-xl font-semibold text-sm text-white bg-gradient-to-br from-pink-400 to-pink-600 shadow-lg shadow-pink-900/40 transition-all hover:-translate-y-0.5 hover:shadow-xl disabled:opacity-70 disabled:translate-y-0"
           >
-            {submitting ? "Sign Up..." : "Sign Up"}
+            {loading ? (
+              <div className="flex items-center justify-center">
+                <Loader className="w-5 h-5 animate-spin text-white" />
+              </div>
+            ) : (
+              "Sign Up"
+            )}
           </button>
         </form>
 
         <p className="text-center text-sm text-gray-500 mt-6">
           Already have an account?{" "}
-          <Link to='/login' className="text-white hover:underline">
+          <Link to="/login" className="text-white hover:underline">
             Sign in
           </Link>
         </p>
       </div>
     </main>
-  )
-}
+  );
+};
 
-export default Register
+export default Register;
